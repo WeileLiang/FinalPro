@@ -61,11 +61,12 @@ public class ProductStructionPanel extends JPanel {
 	private TablePanel tablePanel;
 
 	//表格数据
-//	private Object[][] datas;
+	private Object[][] datas;
 	
 	private JLabel returnLabel;
 	
-	public ProductStructionPanel() {
+	public ProductStructionPanel(Object[][] datas) {
+		this.datas=datas;
 		initViews();
 		measureAndLayout();
 		setListeners();
@@ -132,7 +133,7 @@ public class ProductStructionPanel extends JPanel {
 		int itemWidth = MyFrame.WIDTH * 3 / 4 / dataLabels.length;
 		int labelWidth = itemWidth / 3;
 		int fieldWidth = itemWidth * 2 / 3;
-		int labelHeight = labelWidth / 3;
+		int labelHeight = labelWidth / 5;
 
 		int curX = MyFrame.WIDTH / 4 / 2;
 		int curY = MARGIN_TOP + scrollPane.getHeight() + 40;
@@ -196,7 +197,7 @@ public class ProductStructionPanel extends JPanel {
 //		changePhotoBtn.setBorder(btnborder);
 
 		// 表格
-		tablePanel = new TablePanel(readDatas());
+		tablePanel = new TablePanel(datas);
 
 		// 选中行的显示和修改
 		Object[] tableHead = tablePanel.getTableRow(0);

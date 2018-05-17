@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -21,6 +22,7 @@ import model.Factory.Machine;
 import panels.GridPanel;
 import panels.JobshopInfoPanel;
 import panels.LeftSidePanel;
+import panels.ProductStructionPanel;
 
 /**
  * 工艺配置模块
@@ -71,7 +73,14 @@ public class CraftPanel extends JPanel {
 			@Override
 			public void onItemClick(int position) {
 				// TODO Auto-generated method stub
+				Object[][] productDetails=new Object[products.size()+1][];
+				productDetails[0]=new String[] {"工件名称","数量"};
+				Product product=products.get(position);
+				for(int i=0;i<products.size();i++) {
+					productDetails[i+1]=new String[] {product.parts.get(i),product.counts.get(i)+""};
+				}
 				
+				MyFrame.globalFrame.addFurtherPanel(new ProductStructionPanel(productDetails),1);
 			}
 		});
 		
@@ -131,6 +140,7 @@ public class CraftPanel extends JPanel {
 	private void readDatas() {
 		BufferedReader reader = null;
 		try {
+			//读取产品信息
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream("products.txt")));
 			int productCount = Integer.parseInt(reader.readLine());
 			products = new ArrayList<>();
@@ -150,6 +160,15 @@ public class CraftPanel extends JPanel {
 				products.add(new Product(nameAndCount[0], partNames, counts));
 			}
 
+			//读取工件列表
+			
+			reader=new BufferedReader(new InputStreamReader(new FileInputStream("parts.txt")));
+			parts=new ArrayList<>();
+			String line=null;
+			while((line=reader.readLine())!=null) {
+				BufferedReader tempReader=new BufferedReader(new InputStreamReader(new FileInputStream("parts_detail\\"+line+".txt")));
+				
+			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
