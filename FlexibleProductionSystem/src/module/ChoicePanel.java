@@ -18,7 +18,7 @@ import views.TransparentLabel;
 public class ChoicePanel extends JPanel {
 
 	private float initAlpha = 1.f;
-	private String[] itemNames = { "信息管理", "工艺配置", "登录管理", "登录管理", "工厂资源配置", "使用帮助", };
+	private String[] itemNames = { "信息管理", "工艺配置", "登录管理", "工厂资源配置", "生产调度", "使用帮助", };
 	private List<TransparentLabel> items = new ArrayList<>();
 
 	public static final int ITEM_WIDTH = MyFrame.WIDTH / 4;
@@ -81,18 +81,16 @@ public class ChoicePanel extends JPanel {
 
 					switch (temp) {
 					case 0:
-						InfoManagePanel infoManagePanel = new InfoManagePanel();
-						infoManagePanel.setBounds(0, 0, infoManagePanel.getWidth(), infoManagePanel.getHeight());
-						MyFrame.globalFrame.addFurtherPanel(infoManagePanel, 1);
+						MyFrame.globalFrame.addFurtherPanel(new InfoManagePanel(), 1);
 						break;
 					case 1:
-						
 						MyFrame.globalFrame.addFurtherPanel(new CraftPanel(), 1);
 						break;
+					case 3:
+						MyFrame.globalFrame.addFurtherPanel(new ResourcePanel(), 1);
+						break;	
 					case 4:
-						ResourcePanel resourcePanel = new ResourcePanel();
-						resourcePanel.setBounds(0, 0, resourcePanel.getWidth(), resourcePanel.getHeight());
-						MyFrame.globalFrame.addFurtherPanel(resourcePanel, 1);
+						MyFrame.globalFrame.addFurtherPanel(new SchedulePanel(), 1);
 						break;	
 					default:
 						break;

@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import adapter.OnItemClickListener;
 import main.MyFrame;
+import views.PartTableHead;
 import views.TableRow;
 
 public class TablePanel extends JPanel {
@@ -29,10 +30,28 @@ public class TablePanel extends JPanel {
 
 	private OnItemClickListener onItemClickListener;
 
+	// 该表格是否用于展示工件的机器选择
+	private boolean isPartDetail;
+
 	public TablePanel(Object[][] datas) {
 		this.datas = datas;
 		// 表格的高度=表头高度+各个数据行的高度
-		height = TableRow.largerHeight + (datas.length - 1) * TableRow.normalHeight;
+		
+			height = TableRow.largerHeight + (datas.length - 1) * TableRow.normalHeight;
+
+		scales = new int[datas[0].length];
+		Arrays.fill(scales, 1);
+
+		initViews();
+		measureAndLayout();
+		setListeners();
+	}
+
+	public TablePanel(Object[][] datas, boolean isPartDetail) {
+		this.isPartDetail = isPartDetail;
+		this.datas = datas;
+		// 表格的高度=表头高度+各个数据行的高度
+		height = PartTableHead.HEAD_HEIGHT+(datas.length -1) * TableRow.normalHeight;
 
 		scales = new int[datas[0].length];
 		Arrays.fill(scales, 1);
@@ -112,7 +131,10 @@ public class TablePanel extends JPanel {
 
 		for (int i = 0; i < datas.length; i++) {
 			if (i == 0) {
-				tableRows.add(new TableRow(i, datas[i], scales, true, false));
+				if (isPartDetail) {
+					tableRows.add(new PartTableHead(i, datas[i], scales, true, false));
+				} else
+					tableRows.add(new TableRow(i, datas[i], scales, true, false));
 			} else if (i == datas.length - 1) {
 				tableRows.add(new TableRow(i, datas[i], scales, false, true));
 			} else {

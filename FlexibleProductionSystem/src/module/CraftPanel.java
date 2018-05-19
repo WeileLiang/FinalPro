@@ -17,11 +17,13 @@ import main.MyFrame;
 import model.Factory;
 import model.Product;
 import model.Product.Part;
+import model.Product.Procedure;
 import model.Factory.Jobshop;
 import model.Factory.Machine;
 import panels.GridPanel;
 import panels.JobshopInfoPanel;
 import panels.LeftSidePanel;
+import panels.PartDetailPanel;
 import panels.ProductStructionPanel;
 
 /**
@@ -65,6 +67,24 @@ public class CraftPanel extends JPanel {
 //				curGridPanel.setBounds(MyFrame.WIDTH / 4, 0, curGridPanel.getWidth(), curGridPanel.getHeight());
 //				add(curGridPanel);
 //				repaint();
+				
+				if (position==0) {
+					if(curGridPanel!=productGridPanel) {
+						remove(curGridPanel);
+						add(productGridPanel);
+						curGridPanel=productGridPanel;
+						repaint();
+					}
+				} else {
+					if(curGridPanel!=partGridPanel) {
+						remove(curGridPanel);
+						add(partGridPanel);
+						curGridPanel=partGridPanel;
+						repaint();
+					}
+					
+				}
+				
 			}
 		});
 
@@ -81,6 +101,34 @@ public class CraftPanel extends JPanel {
 				}
 				
 				MyFrame.globalFrame.addFurtherPanel(new ProductStructionPanel(productDetails),1);
+			}
+		});
+		
+		partGridPanel.setGridItemClickListener(new OnItemClickListener() {
+			
+			@Override
+			public void onItemClick(int position) {
+				// TODO Auto-generated method stub
+				List<Procedure> procedures=parts.get(position).procedures;
+				
+				Object[][] datas=new Object[procedures.size()+1][];
+				int machineCount=procedures.get(0).times.size();
+				
+				datas[0]=new Object[machineCount+1];
+				datas[0][0]="工序";
+				for(int i=1;i<datas[0].length;i++) {
+					datas[0][i]="M"+i;
+				}
+				
+				for(int i=0;i<procedures.size();i++) {
+					datas[i+1]=new Object[machineCount+1];
+					datas[i+1][0]=procedures.get(i).name;
+					for (int j = 0; j < machineCount; j++) {
+						datas[i+1][j+1]=procedures.get(i).times.get(j);
+					}
+				}
+				
+				MyFrame.globalFrame.addFurtherPanel(new PartDetailPanel(datas), 1);
 			}
 		});
 		
@@ -107,6 +155,9 @@ public class CraftPanel extends JPanel {
 		
 		productGridPanel.setBounds(MyFrame.WIDTH/4, 0, productGridPanel.getWidth(), productGridPanel.getHeight());
 		add(productGridPanel);
+		curGridPanel=productGridPanel;
+		
+		partGridPanel.setBounds(MyFrame.WIDTH/4, 0, partGridPanel.getWidth(), partGridPanel.getHeight());
 //		add(gridPanels.get(0));
 //		curGridPanel = gridPanels.get(0);
 	}
@@ -135,6 +186,9 @@ public class CraftPanel extends JPanel {
 		for(Product product:products) productNames.add(product.name);
 		productGridPanel=new GridPanel(productNames);
 
+		List<String> partNames=new ArrayList<>();
+		for(Part part:parts) partNames.add(part.name);
+		partGridPanel=new GridPanel(partNames);
 	}
 
 	private void readDatas() {
@@ -161,14 +215,25 @@ public class CraftPanel extends JPanel {
 			}
 
 			//读取工件列表
-			
 			reader=new BufferedReader(new InputStreamReader(new FileInputStream("parts.txt")));
 			parts=new ArrayList<>();
-			String line=null;
-			while((line=reader.readLine())!=null) {
-				BufferedReader tempReader=new BufferedReader(new InputStreamReader(new FileInputStream("parts_detail\\"+line+".txt")));
-				
+			String partName=null;
+			while((partName=reader.readLine())!=null) {//工件的文件名称
+				BufferedReader tempReader=new BufferedReader(new InputStreamReader(new FileInputStream("parts_detail\\"+partName+".txt")));
+				List<Procedure> procedures=new ArrayList<>();
+				String nameAndTimeList=null;
+				while((nameAndTimeList=tempReader.readLine())!=null) {
+					String[] nameAndTimeArray=nameAndTimeList.split(" ");
+					List<String> times=new ArrayList<>();
+					for(int i=1;i<nameAndTimeArray.length;i++) {
+						times.add(nameAndTimeArray[i]);
+					}
+					
+					procedures.add(new Procedure(nameAndTimeArray[0], times));
+				}
+				parts.add(new Part(partName, procedures));
 			}
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

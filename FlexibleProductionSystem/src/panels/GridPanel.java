@@ -23,11 +23,11 @@ public class GridPanel extends JPanel {
 
 	public static final int ITEM_COUNT_IN_LINE = 5;
 
-	private int width = MyFrame.WIDTH * 3 / 4;
-	private int height = MyFrame.HEIGHT;
+	public static int width = MyFrame.WIDTH * 3 / 4;
+	public static int height = MyFrame.HEIGHT;
 
-	private int marginLR = width / 27;
-	private int marginTB = height / 10;
+	public static int marginLR = width / 27;
+	public static int marginTB = height / 10;
 	private int gapHor = width / 16;
 	private int gapVer = height / 25;
 
