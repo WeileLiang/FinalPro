@@ -1,7 +1,9 @@
 package module;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -9,22 +11,34 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
+import adapter.OnItemClickListener;
+import adapter.OnNotifyListener;
 import main.MyFrame;
 import model.Factory;
 import model.Factory.Jobshop;
 import model.Factory.Machine;
+import panels.FaultSettingPanel;
 import panels.GridPanel;
 import panels.LeftSidePanel;
+import panels.ParameterSettingPanel;
+import panels.TimeLinePanel;
+import views.HorizontalScrollBarUI;
+import views.LineSeparator;
 import views.VerticalLineSeparator;
+import views.VerticalScrollBarUI;
 
 /**
  * 生产调度模块
@@ -58,6 +72,7 @@ public class SchedulePanel extends JPanel {
 
 	private List<Factory> factories;
 	private List<String> factoryNames;
+	private GridPanel resoourceGridPanel;
 
 	private boolean hasAddEnsureAndCancel;
 	private JLabel ensureLabel = new JLabel("确定", JLabel.CENTER);
@@ -67,6 +82,13 @@ public class SchedulePanel extends JPanel {
 
 	private JPanel curPanel;
 
+	//显示调度结果
+	private JLabel infoLabel;
+	
+	private List<String> names;
+	private List<List<double[]>> chipLists;
+	private List<List<String>> procedureLists;
+	
 	public SchedulePanel() {
 
 		readProductDatas();
@@ -86,16 +108,93 @@ public class SchedulePanel extends JPanel {
 				addTaskPanel();
 			}
 		});
+
+		resourceLabel.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				addEnsureAndCancel();
+				addResourcePanel();
+			}
+		});
+	
+		parameterLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				
+				JDialog dialog = new JDialog();
+				ParameterSettingPanel panel = new ParameterSettingPanel();
+				dialog.setLayout(null);
+				dialog.setSize(new Dimension(panel.getWidth(), panel.getHeight()));
+				panel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+				
+				panel.setOnNotifyListener(new OnNotifyListener() {
+					
+					@Override
+					public void notifyParent(int singal) {
+						// TODO Auto-generated method stub
+						dialog.dispose();
+					}
+				});
+				
+				dialog.add(panel);
+				dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+				dialog.setLocationRelativeTo(null);
+				dialog.setResizable(false);
+				dialog.setVisible(true);
+			}
+		});
+		
+		faultLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				
+				JDialog dialog = new JDialog();
+				FaultSettingPanel panel = new FaultSettingPanel();
+				dialog.setLayout(null);
+				dialog.setSize(new Dimension(panel.getWidth(), panel.getHeight()));
+				panel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+				
+				panel.setOnNotifyListener(new OnNotifyListener() {
+					
+					@Override
+					public void notifyParent(int singal) {
+						// TODO Auto-generated method stub
+						dialog.dispose();
+					}
+				});
+				
+				dialog.add(panel);
+				dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+				dialog.setLocationRelativeTo(null);
+				dialog.setResizable(false);
+				dialog.setVisible(true);
+			}
+		});
+	
+		startLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				addInfoLabel();
+				readResult();
+				addTimeLinePanel();
+				repaint();
+			}
+		});
 	}
 
 	private void measureAndLayout() {
 		// TODO Auto-generated method stub
 		leftSidePanel.setBounds(-LeftSidePanel.REBOUND_WIDTH, 0, leftSidePanel.getWidth(), leftSidePanel.getHeight());
 		add(leftSidePanel);
-
-		VerticalLineSeparator separator = new VerticalLineSeparator(5, MyFrame.HEIGHT, Color.WHITE);
-		separator.setBounds(MyFrame.WIDTH / 4, 0, separator.getWidth(), separator.getHeight());
-		add(separator);
 
 		int curX = MyFrame.WIDTH / 4 + MARGIN_LEFT;
 		int curY = MARGIN_TOP;
@@ -115,7 +214,7 @@ public class SchedulePanel extends JPanel {
 		setLayout(null);
 		setBackground(Color.GRAY);
 
-		leftSidePanel = new LeftSidePanel("生产调度", Arrays.asList("任务配置", "工厂一", "工厂二"));
+		leftSidePanel = new LeftSidePanel("生产调度", Arrays.asList("任务配置", "工厂一", "工厂二"),true);
 
 		// 操作按钮
 		Border border = BorderFactory.createLineBorder(Color.WHITE, 1);
@@ -128,13 +227,40 @@ public class SchedulePanel extends JPanel {
 
 	}
 
+	private void addTimeLinePanel() {
+
+		LineSeparator mSeparator=new LineSeparator(MyFrame.WIDTH*3/4, 2, Color.WHITE);
+		mSeparator.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13, mSeparator.getWidth(), mSeparator.getHeight());
+		add(mSeparator);
+		
+		TimeLinePanel timeLinePanel=new TimeLinePanel(names, chipLists, procedureLists);
+		JScrollPane scrollPane=new JScrollPane(timeLinePanel);
+		scrollPane.setBounds(MyFrame.WIDTH/4,mSeparator.getHeight()+MyFrame.HEIGHT*2/13,MyFrame.WIDTH*3/4-8,MyFrame.HEIGHT*11/13);
+		scrollPane.getVerticalScrollBar().setUI(new VerticalScrollBarUI());
+		add(scrollPane);
+		JScrollBar bar=scrollPane.getVerticalScrollBar();
+		bar.setValue(1);
+	}
+	
+	private void addInfoLabel() {
+		infoLabel=new JLabel("最优解时间:52   计算时间5.123s");
+		infoLabel.setFont(new Font("黑体", Font.PLAIN, 23));
+		infoLabel.setForeground(Color.WHITE);
+		
+		int curX=MyFrame.WIDTH/4+MARGIN_LEFT;
+		int curY=MARGIN_TOP+LABEL_HEIGHT;
+		infoLabel.setBounds(curX,curY , MyFrame.WIDTH*3/4, MyFrame.HEIGHT*2/13-curY);
+		
+		add(infoLabel);
+	}
+	
 	private void addEnsureAndCancel() {
 		if (hasAddEnsureAndCancel)
 			return;
 
 		hasAddEnsureAndCancel = true;
 
-		int curX = MyFrame.WIDTH/4+MARGIN_LEFT;
+		int curX = MyFrame.WIDTH / 4 + MARGIN_LEFT;
 		int curY = MARGIN_TOP + LABEL_HEIGHT + MARGIN_TOP;
 
 		ensureLabel.setBounds(curX, curY, LABEL_WIDTH, LABEL_HEIGHT);
@@ -143,6 +269,21 @@ public class SchedulePanel extends JPanel {
 
 		add(ensureLabel);
 		add(cancelLabel);
+
+		MouseAdapter adapter = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				removeEnsureAndCancel();
+				remove(curPanel);
+				curPanel = null;
+				repaint();
+			}
+		};
+
+		ensureLabel.addMouseListener(adapter);
+		cancelLabel.addMouseListener(adapter);
 	}
 
 	private void removeEnsureAndCancel() {
@@ -157,15 +298,81 @@ public class SchedulePanel extends JPanel {
 	private void addTaskPanel() {
 		int curX = MyFrame.WIDTH / 4;
 		int curY = MARGIN_TOP * 3 + LABEL_HEIGHT * 2;
-		if (curPanel == null || (curPanel != null && curPanel != taskGridPanel)) {
-			taskGridPanel = new GridPanel(productNames);
-			taskGridPanel.setBounds(curX, curY-GridPanel.marginTB, taskGridPanel.getWidth(), taskGridPanel.getHeight());
-			if (curPanel != null)
-				remove(curPanel);
-			add(taskGridPanel);
-			curPanel = taskGridPanel;
-			repaint();
+		taskGridPanel = new GridPanel(productNames);
+		taskGridPanel.setBounds(curX, curY - GridPanel.marginTB, taskGridPanel.getWidth(), taskGridPanel.getHeight());
+		add(taskGridPanel);
+
+		curPanel = taskGridPanel;
+		taskGridPanel.setGridItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(int position) {
+				// TODO Auto-generated method stub
+				taskGridPanel.setChosenState(position);
+			}
+		});
+
+		repaint();
+
+	}
+
+	//读取运行结果
+	private void readResult() {
+		BufferedReader reader=null;
+		names=new ArrayList<>();
+		chipLists=new ArrayList<>();
+		procedureLists=new ArrayList<>();
+		try {
+			reader=new BufferedReader(new InputStreamReader(new FileInputStream("results\\result1.txt")));
+			int machineCount=Integer.parseInt(reader.readLine());
+			
+			while (machineCount-->0) {
+				reader.readLine();
+				String[] machineNameAndChipCount=reader.readLine().split(" ");
+				names.add(machineNameAndChipCount[0]);
+				
+				int chipCount=Integer.parseInt(machineNameAndChipCount[1]);
+				List<double[]> chips=new ArrayList<>();
+				List<String> procedures=new ArrayList<>();
+				while (chipCount-->0) {
+					String[] chipAndProcedure=reader.readLine().split(" ");
+					chips.add(new double[] {Double.parseDouble(chipAndProcedure[0]),Double.parseDouble(chipAndProcedure[1])});
+					procedures.add(chipAndProcedure[2]);
+				}
+				chipLists.add(chips);
+				procedureLists.add(procedures);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+	}
+	
+	private void addResourcePanel() {
+		int curX = MyFrame.WIDTH / 4;
+		int curY = MARGIN_TOP * 3 + LABEL_HEIGHT * 2;
+			resoourceGridPanel = new GridPanel(factoryNames);
+			resoourceGridPanel.setBounds(curX, curY - GridPanel.marginTB, resoourceGridPanel.getWidth(),
+					resoourceGridPanel.getHeight());
+			add(resoourceGridPanel);
+
+			curPanel = resoourceGridPanel;
+			resoourceGridPanel.setGridItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(int position) {
+					// TODO Auto-generated method stub
+					resoourceGridPanel.setChosenState(position);
+				}
+			});
+
+			repaint();
 	}
 
 	private void readProductDatas() {
@@ -250,4 +457,5 @@ public class SchedulePanel extends JPanel {
 		for (Factory factory : factories)
 			factoryNames.add(factory.name);
 	}
+	
 }

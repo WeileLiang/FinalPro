@@ -6,18 +6,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
 import adapter.OnNotifyListener;
+import constant.AnimationUtil;
 import constant.Constants;
 import main.MyFrame;
-import panels.InfoTypePanel;
 import views.TransparentLabel;
 
 public class ChoicePanel extends JPanel {
 
-	private float initAlpha = 1.f;
+	private float initAlpha = 0.f;
 	private String[] itemNames = { "信息管理", "工艺配置", "登录管理", "工厂资源配置", "生产调度", "使用帮助", };
 	private List<TransparentLabel> items = new ArrayList<>();
 
@@ -32,6 +34,7 @@ public class ChoicePanel extends JPanel {
 		initViews();
 		measureAndLayout();
 		setListeners();
+		doAlphaAnim(ANIM_IN, null);
 	}
 
 	private void initViews() {
@@ -75,31 +78,89 @@ public class ChoicePanel extends JPanel {
 
 	private void setListeners() {
 		for (int i = 0; i < items.size(); i++) {
-			final int temp=i; 
+			final int temp = i;
 			items.get(i).addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
 
-					switch (temp) {
-					case 0:
-						MyFrame.globalFrame.addFurtherPanel(new InfoManagePanel(), 1);
-						break;
-					case 1:
-						MyFrame.globalFrame.addFurtherPanel(new CraftPanel(), 1);
-						break;
-					case 3:
-						MyFrame.globalFrame.addFurtherPanel(new ResourcePanel(), 1);
-						break;	
-					case 4:
-						MyFrame.globalFrame.addFurtherPanel(new SchedulePanel(), 1);
-						break;	
-					default:
-						break;
-					}
-				
+					AnimationUtil.doShrinkAnima(items.get(temp), new OnNotifyListener() {
+
+						@Override
+						public void notifyParent(int singal) {
+							// TODO Auto-generated method stub
+							doAlphaAnim(ANIM_OUT, new OnNotifyListener() {
+
+								@Override
+								public void notifyParent(int singal) {
+									// TODO Auto-generated method stub
+									switch (temp) {
+									case 0:
+										MyFrame.globalFrame.addFurtherPanel(new InfoManagePanel(), 1);
+										break;
+									case 1:
+										MyFrame.globalFrame.addFurtherPanel(new CraftPanel(), 1);
+										break;
+									case 3:
+										MyFrame.globalFrame.addFurtherPanel(new ResourcePanel(), 1);
+										break;
+									case 4:
+										MyFrame.globalFrame.addFurtherPanel(new SchedulePanel(), 1);
+										break;
+									default:
+										break;
+									}
+								}
+							});
+						}
+					});
+
 				};
 
 			});
 		}
+	}
+
+	// 淡入动画
+	public static int ANIM_IN = 0;
+	// 淡出动画
+	public static int ANIM_OUT = 1;
+
+	/**
+	 * 淡入淡出动画
+	 */
+	int curTime = 0;
+
+	public void doAlphaAnim(int animType, OnNotifyListener onNotifyListener) {
+		curTime = 0;
+		float initAlpha = items.get(0).getAlpha();
+		final float targetAlpha = animType == ANIM_IN ? 1.0f - initAlpha : .0f - initAlpha;
+		int delayTime = 0;
+
+		final int lastTime = 600;
+		final Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				float curAlpha = (float) (initAlpha + (1 - Math.cos(Math.PI / 2 * curTime / lastTime)) * targetAlpha);
+
+				for (TransparentLabel label : items) {
+					label.setAlpha(curAlpha);
+					repaint();
+				}
+
+				curTime += LoginPanel.PERIOD;
+				if (curTime > lastTime) {
+					timer.cancel();
+
+					if (onNotifyListener != null)
+						onNotifyListener.notifyParent(0);
+					// if (animType == ANIM_OUT && itemClickListener != null)
+					// itemClickListener.onItemClick(itemPosition);
+
+				}
+			}
+		}, delayTime, LoginPanel.PERIOD);
 	}
 
 	public void setOnNotifyListener(OnNotifyListener onNotifyListener) {

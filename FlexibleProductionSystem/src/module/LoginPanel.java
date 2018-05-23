@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 
 import adapter.OnClickedListener;
 import adapter.OnNotifyListener;
+import constant.AnimationUtil;
 import main.MyFrame;
 import views.PressedButton;
 
@@ -29,7 +30,7 @@ public class LoginPanel extends JPanel {
 	private PressedButton registerBtn = new PressedButton("注册");
 
 	private OnNotifyListener onNotifyListener;
-	
+
 	int width = MyFrame.WIDTH / 4;
 	int height = MyFrame.HEIGHT / 4;
 
@@ -101,7 +102,15 @@ public class LoginPanel extends JPanel {
 
 			@Override
 			public void onClick(JComponent component) {
-				if(onNotifyListener!=null) onNotifyListener.notifyParent(0);
+				AnimationUtil.doSlideAima(LoginPanel.this, (MyFrame.WIDTH - width) / 2, (MyFrame.WIDTH - width) / 2,
+						(MyFrame.HEIGHT - height) / 2, MyFrame.HEIGHT, 500, 0, new OnNotifyListener() {
+
+							@Override
+							public void notifyParent(int singal) {
+								// TODO Auto-generated method stub
+								MyFrame.globalFrame.addFurtherPanel(new ChoicePanel(), 1);
+							}
+						});
 			}
 		};
 
@@ -109,9 +118,8 @@ public class LoginPanel extends JPanel {
 		registerBtn.setOnClickedListener(listener);
 	}
 
-	
 	public void setOnNotifyListener(OnNotifyListener onNotifyListener) {
 		this.onNotifyListener = onNotifyListener;
 	}
-	
+
 }

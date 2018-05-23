@@ -14,6 +14,7 @@ import adapter.OnItemClickListener;
 import constant.Constants;
 import main.MyFrame;
 import views.LineSeparator;
+import views.VerticalLineSeparator;
 
 public class LeftSidePanel extends JPanel {
 
@@ -39,6 +40,9 @@ public class LeftSidePanel extends JPanel {
 
 	private OnItemClickListener itemClickListener;
 
+	private boolean hasVerticalLine=false;
+	private int verticalSeparatorWidth=0;
+	
 	//当前被点击的item
 	private int curClickPos=0;
 	public LeftSidePanel(String tag, List<String> items) {
@@ -50,6 +54,18 @@ public class LeftSidePanel extends JPanel {
 		setListeners();
 	}
 
+	public LeftSidePanel(String tag, List<String> items,boolean hasVerticalLine) {
+		
+		this.hasVerticalLine=hasVerticalLine;
+		verticalSeparatorWidth=5;
+		this.tag = tag;
+		this.items = items;
+
+		initViews();
+		measureAndLayout();
+		setListeners();
+	}
+	
 	private void initViews() {
 		setLayout(null);
 		setSize(width, height);
@@ -68,11 +84,18 @@ public class LeftSidePanel extends JPanel {
 	}
 
 	private void measureAndLayout() {
+		
+		if(hasVerticalLine) {
+			VerticalLineSeparator separator = new VerticalLineSeparator(verticalSeparatorWidth, MyFrame.HEIGHT, Color.WHITE);
+			separator.setBounds(width-separator.getWidth(), 0, separator.getWidth(), separator.getHeight());
+			add(separator);
+		}
+		
 		returnLabel.setBounds(REBOUND_WIDTH+MyFrame.RETURN_LEFT_MARGIN, MyFrame.RETURN_TOP_MARGIN, 100, 50);
 
 		int curY = MyFrame.RETURN_TOP_MARGIN + returnLabel.getHeight();
 
-		tagLabel.setBounds(REBOUND_WIDTH, curY, getVisibleWidth(), tagHeight);
+		tagLabel.setBounds(REBOUND_WIDTH, curY, getVisibleWidth()-verticalSeparatorWidth, tagHeight);
 //		tagLabel.setOpaque(true);
 //		tagLabel.setBackground(Color.RED);
 		add(returnLabel);
@@ -83,14 +106,14 @@ public class LeftSidePanel extends JPanel {
 		Font contentFont = new Font("黑体", Font.PLAIN, 18);
 		for (String item : items) {
 			JLabel label = new JLabel("         " + item);
-			label.setBounds(0, curY, width, labelHeight);
+			label.setBounds(0, curY, width-verticalSeparatorWidth, labelHeight);
 			label.setForeground(Color.WHITE);
 			label.setFont(contentFont);
 			label.setOpaque(true);
 			label.setBackground(null);
 			curY += labelHeight;
 
-			LineSeparator line = new LineSeparator(width, separatorHeight, Color.WHITE);
+			LineSeparator line = new LineSeparator(width-verticalSeparatorWidth, separatorHeight, Color.WHITE);
 			line.setBounds(0, curY, line.getWidth(), line.getHeight());
 
 			curY += separatorHeight;
@@ -102,6 +125,8 @@ public class LeftSidePanel extends JPanel {
 		}
 
 		setSelectedItem(0);
+		
+		
 	}
 
 	public int getVisibleWidth() {

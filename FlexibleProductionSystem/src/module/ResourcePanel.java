@@ -12,6 +12,8 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import adapter.OnItemClickListener;
+import adapter.OnNotifyListener;
+import constant.AnimationUtil;
 import main.MyFrame;
 import model.Factory;
 import model.Factory.Jobshop;
@@ -40,6 +42,8 @@ public class ResourcePanel extends JPanel {
 		initViews();
 		measureAndLayout();
 		setListeners();
+
+		doReboundAnima();
 	}
 
 	private void setListeners() {
@@ -62,10 +66,18 @@ public class ResourcePanel extends JPanel {
 				@Override
 				public void onItemClick(int position) {
 					// TODO Auto-generated method stub
-					Jobshop curJobshop = factories.get(leftSidePanel.getCurClickPos()).jobshops.get(position);
-					String title = factories.get(leftSidePanel.getCurClickPos()).name + " "
-							+ curGridPanel.getKthItem(position).getLabelText();
-					MyFrame.globalFrame.addFurtherPanel(new JobshopInfoPanel(curJobshop.getMchinedatas(), title), 1);
+					AnimationUtil.doShrinkAnima(gridPanel.getKthItem(position), new OnNotifyListener() {
+
+						@Override
+						public void notifyParent(int singal) {
+							// TODO Auto-generated method stub
+							Jobshop curJobshop = factories.get(leftSidePanel.getCurClickPos()).jobshops.get(position);
+							String title = factories.get(leftSidePanel.getCurClickPos()).name + " "
+									+ curGridPanel.getKthItem(position).getLabelText();
+							MyFrame.globalFrame
+									.addFurtherPanel(new JobshopInfoPanel(curJobshop.getMchinedatas(), title), 1);
+						}
+					});
 				}
 			});
 	}
@@ -76,6 +88,7 @@ public class ResourcePanel extends JPanel {
 		gridPanels.get(0).setBounds(MyFrame.WIDTH / 4, 0, gridPanels.get(0).getWidth(), gridPanels.get(0).getHeight());
 
 		add(leftSidePanel);
+		gridPanels.get(0).setAlpha(0.f);
 		add(gridPanels.get(0));
 		curGridPanel = gridPanels.get(0);
 	}
@@ -145,5 +158,25 @@ public class ResourcePanel extends JPanel {
 				}
 		}
 
+	}
+
+	private void doReboundAnima() {
+		AnimationUtil.doSlideAima(leftSidePanel, -leftSidePanel.getWidth(), 0, 0, 0, AnimationUtil.SLIDE_TIME, 0,
+				new OnNotifyListener() {
+
+					@Override
+					public void notifyParent(int singal) {
+						// TODO Auto-generated method stub
+						AnimationUtil.doSlideAima(leftSidePanel, 0, -LeftSidePanel.REBOUND_WIDTH, 0, 0,
+								AnimationUtil.REBOUND_TIME, 0, new OnNotifyListener() {
+
+									@Override
+									public void notifyParent(int singal) {
+										// TODO Auto-generated method stub
+										curGridPanel.doAlphaInAnim(0);
+									}
+								});
+					}
+				});
 	}
 }
