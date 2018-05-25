@@ -29,10 +29,10 @@ public class AnimationUtil {
 				// TODO Auto-generated method stub
 				int curWidth= (int) (startWidth+(1- Math.cos(Math.PI / 2 * curTime / duration))*disWidth);
 				
-				component.setBounds(component.getX(), component.getY(), targetWidth, component.getHeight());
+				component.setBounds(component.getX(), component.getY(), curWidth, component.getHeight());
 				
 				curTime+=PERIOD;
-				if(curTime>PERIOD) {
+				if(curTime>duration) {
 					timer.cancel();
 					if (onNotifyListener!=null) {
 						onNotifyListener.notifyParent(0);

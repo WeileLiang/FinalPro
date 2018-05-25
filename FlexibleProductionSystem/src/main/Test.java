@@ -43,9 +43,9 @@ public class Test extends JFrame {
 		
 		JPanel line=new JPanel();
 		line.setBackground(Color.WHITE);
-		line.setBounds(0, MyFrame.HEIGHT/2, 0, 5);
+		line.setBounds(0, MyFrame.HEIGHT/2, 0, 3);
 		add(line);
-		AnimationUtil.doProgressAnim(line, 0, MyFrame.WIDTH, 20000, null);
+		AnimationUtil.doProgressAnim(line, 0, MyFrame.WIDTH, 1500, null);
 	}
 
 	public static void main(String[] args) {

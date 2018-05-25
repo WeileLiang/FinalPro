@@ -26,6 +26,7 @@ import javax.swing.border.Border;
 
 import adapter.OnItemClickListener;
 import adapter.OnNotifyListener;
+import constant.AnimationUtil;
 import main.MyFrame;
 import model.Factory;
 import model.Factory.Jobshop;
@@ -229,13 +230,19 @@ public class SchedulePanel extends JPanel {
 
 	private void addTimeLinePanel() {
 
-		LineSeparator mSeparator=new LineSeparator(MyFrame.WIDTH*3/4, 2, Color.WHITE);
-		mSeparator.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13, mSeparator.getWidth(), mSeparator.getHeight());
-		add(mSeparator);
+//		LineSeparator mSeparator=new LineSeparator(MyFrame.WIDTH*3/4, 2, Color.WHITE);
+//		mSeparator.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13, mSeparator.getWidth(), mSeparator.getHeight());
+//		add(mSeparator);
+		
+		JPanel horLine=new JPanel();
+		horLine.setBackground(Color.WHITE);
+		horLine.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13, 0, 3);
+		add(horLine);
+		AnimationUtil.doProgressAnim(horLine, 0, MyFrame.WIDTH*3/4, 800, null);
 		
 		TimeLinePanel timeLinePanel=new TimeLinePanel(names, chipLists, procedureLists);
 		JScrollPane scrollPane=new JScrollPane(timeLinePanel);
-		scrollPane.setBounds(MyFrame.WIDTH/4,mSeparator.getHeight()+MyFrame.HEIGHT*2/13,MyFrame.WIDTH*3/4-8,MyFrame.HEIGHT*11/13);
+		scrollPane.setBounds(MyFrame.WIDTH/4,horLine.getHeight()+MyFrame.HEIGHT*2/13,MyFrame.WIDTH*3/4-8,MyFrame.HEIGHT*11/13);
 		scrollPane.getVerticalScrollBar().setUI(new VerticalScrollBarUI());
 		add(scrollPane);
 		JScrollBar bar=scrollPane.getVerticalScrollBar();
