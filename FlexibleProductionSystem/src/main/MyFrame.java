@@ -9,7 +9,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Stack;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -27,7 +29,7 @@ public class MyFrame extends JFrame {
 
 	// 返回按钮的左上边距
 	public static final int RETURN_LEFT_MARGIN = WIDTH / 50;;
-	public static final int RETURN_TOP_MARGIN = HEIGHT / 38;;
+	public static final int RETURN_TOP_MARGIN = HEIGHT / 33;;
 	
 //	static {
 //		UIManager.put("ComboBox.arrowButton.background", Color.DARK_GRAY);  
@@ -76,6 +78,12 @@ public class MyFrame extends JFrame {
 		jLayeredPane.add(loginPanel, new Integer(1));
 		stack.push(loginPanel);
 
+		JLabel producer=new JLabel();
+		ImageIcon icon=new ImageIcon(".\\image\\logo.jpg");
+		producer.setIcon(icon);
+		producer.setBounds(10,5,icon.getIconWidth(),icon.getIconHeight());
+		jLayeredPane.add(producer, new Integer(1));
+		
 		setContentPane(jLayeredPane);
 	}
 
