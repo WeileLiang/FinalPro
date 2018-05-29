@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.Arrays;
 
@@ -21,12 +22,15 @@ public class ResourceFrame extends JFrame {
 
 	public static void main(String[] args) {
 		ResourceFrame frame = new ResourceFrame();
-		frame.setTitle("柔性生产调度系统");
+		frame.setTitle("柔性生产动态调度系统");
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// frame.setResizable(false);
 		frame.setVisible(true);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Image image = tk.createImage("images\\roundlogo.jpg"); /* image.gif是你的图标 */
+		frame.setIconImage(image);
 
 	}
 
@@ -37,10 +41,10 @@ public class ResourceFrame extends JFrame {
 	private void init() {
 		setLayout(null);
 
-		LeftSidePanel leftSidePanel = new LeftSidePanel("工厂资源配置", Arrays.asList("工厂一", "工厂二"));
+		LeftSidePanel leftSidePanel = new LeftSidePanel("工厂资源配置", Arrays.asList("工厂一", "工厂二","工厂三", "工厂四","工厂五", "工厂六","工厂七"));
 		leftSidePanel.setBounds(-LeftSidePanel.REBOUND_WIDTH, 0, WIDTH / 4 + LeftSidePanel.REBOUND_WIDTH, HEIGHT);
 
-		GridPanel gridPanel = new GridPanel(Arrays.asList("车间1","车间2"));
+		GridPanel gridPanel = new GridPanel(Arrays.asList("车间1"));
 		gridPanel.setBounds(WIDTH / 4, 0, WIDTH / 4 * 3, HEIGHT);
 		gridPanel.showManagePanel("添加");
 		gridPanel.setChosenState(0);

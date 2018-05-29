@@ -215,7 +215,7 @@ public class SchedulePanel extends JPanel {
 		setLayout(null);
 		setBackground(Color.GRAY);
 
-		leftSidePanel = new LeftSidePanel("生产调度", Arrays.asList("任务配置", "工厂一", "工厂二"),true);
+		leftSidePanel = new LeftSidePanel("生产调度", Arrays.asList("任务配置", "工厂一", "工厂二", "工厂三", "工厂四", "工厂五", "工厂六", "工厂七"),true);
 
 		// 操作按钮
 		Border border = BorderFactory.createLineBorder(Color.WHITE, 1);
@@ -238,7 +238,7 @@ public class SchedulePanel extends JPanel {
 		horLine.setBackground(Color.WHITE);
 		horLine.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13, 0, 3);
 		add(horLine);
-		AnimationUtil.doProgressAnim(horLine, 0, MyFrame.WIDTH*3/4, 800, null);
+		AnimationUtil.doProgressAnim(horLine, 0, MyFrame.WIDTH*3/4, 2500, null);
 		
 		TimeLinePanel timeLinePanel=new TimeLinePanel(names, chipLists, procedureLists);
 		JScrollPane scrollPane=new JScrollPane(timeLinePanel);
@@ -250,7 +250,7 @@ public class SchedulePanel extends JPanel {
 	}
 	
 	private void addInfoLabel() {
-		infoLabel=new JLabel("最优解时间:52   计算时间5.123s");
+		infoLabel=new JLabel("最优解:52   计算时间4.213s");
 		infoLabel.setFont(new Font("黑体", Font.PLAIN, 23));
 		infoLabel.setForeground(Color.WHITE);
 		

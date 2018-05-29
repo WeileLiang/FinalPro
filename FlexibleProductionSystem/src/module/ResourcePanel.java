@@ -1,5 +1,7 @@
 package module;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import adapter.OnItemClickListener;
 import adapter.OnNotifyListener;
@@ -83,11 +88,13 @@ public class ResourcePanel extends JPanel {
 	}
 
 	private void measureAndLayout() {
+		
+		
 		// TODO Auto-generated method stub
 		leftSidePanel.setBounds(-LeftSidePanel.REBOUND_WIDTH, 0, leftSidePanel.getWidth(), leftSidePanel.getHeight());
 		gridPanels.get(0).setBounds(MyFrame.WIDTH / 4, 0, gridPanels.get(0).getWidth(), gridPanels.get(0).getHeight());
-
 		add(leftSidePanel);
+		
 		gridPanels.get(0).setAlpha(0.f);
 		add(gridPanels.get(0));
 		curGridPanel = gridPanels.get(0);
@@ -109,7 +116,7 @@ public class ResourcePanel extends JPanel {
 		// 默认显示第一间工厂的车间名称
 		gridPanels = new ArrayList<>();
 		for (int i = 0; i < factories.size(); i++) {
-			gridPanels.add(new GridPanel(factories.get(i).getJobshopNames()));
+			gridPanels.add(new GridPanel(factories.get(i).getJobshopNames(),true));
 		}
 
 	}

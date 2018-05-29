@@ -1,11 +1,9 @@
 package main;
 
 import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Stack;
 
@@ -14,11 +12,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 import adapter.OnNotifyListener;
 import module.ChoicePanel;
-import module.InfoManagePanel;
 import module.LoginPanel;
 import views.ShadePanel;
 
@@ -30,11 +26,11 @@ public class MyFrame extends JFrame {
 	// 返回按钮的左上边距
 	public static final int RETURN_LEFT_MARGIN = WIDTH / 50;;
 	public static final int RETURN_TOP_MARGIN = HEIGHT / 33;;
-	
-//	static {
-//		UIManager.put("ComboBox.arrowButton.background", Color.DARK_GRAY);  
-//	}
-	
+
+	// static {
+	// UIManager.put("ComboBox.arrowButton.background", Color.DARK_GRAY);
+	// }
+
 	// 保存添加的面板
 	private Stack<JPanel> stack = new Stack<>();
 	private ShadePanel shadePanel = new ShadePanel();
@@ -46,15 +42,17 @@ public class MyFrame extends JFrame {
 
 	public static void main(String[] args) {
 		MyFrame frame = new MyFrame();
-		frame.setTitle("");
+		frame.setTitle("柔性生产动态调度系统");
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setVisible(true);
 		frame.setEsc();
-		
-		globalFrame=frame;
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Image image = tk.createImage("image\\roundlogo.jpg"); /* image.gif是你的图标 */
+		frame.setIconImage(image);
+		globalFrame = frame;
 	}
 
 	public MyFrame() {
@@ -78,12 +76,12 @@ public class MyFrame extends JFrame {
 		jLayeredPane.add(loginPanel, new Integer(1));
 		stack.push(loginPanel);
 
-		JLabel producer=new JLabel();
-		ImageIcon icon=new ImageIcon(".\\image\\logo.jpg");
+		JLabel producer = new JLabel();
+		ImageIcon icon = new ImageIcon(".\\image\\logo.jpg");
 		producer.setIcon(icon);
-		producer.setBounds(10,5,icon.getIconWidth(),icon.getIconHeight());
+		producer.setBounds(10, 5, icon.getIconWidth(), icon.getIconHeight());
 		jLayeredPane.add(producer, new Integer(1));
-		
+
 		setContentPane(jLayeredPane);
 	}
 
@@ -95,7 +93,7 @@ public class MyFrame extends JFrame {
 				// TODO Auto-generated method stub
 				if (choicePanel == null)
 					choicePanel = new ChoicePanel();
-				
+
 				jLayeredPane.remove(loginPanel);
 				jLayeredPane.add(choicePanel, new Integer(1));
 				stack.push(choicePanel);
@@ -120,6 +118,7 @@ public class MyFrame extends JFrame {
 
 	/**
 	 * 移除当前的面板，添加上一个面板
+	 * 
 	 * @param panel
 	 */
 	public void back2LastPanel() {

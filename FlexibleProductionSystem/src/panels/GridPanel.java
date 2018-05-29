@@ -1,6 +1,8 @@
 package panels;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -8,7 +10,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import adapter.OnItemClickListener;
 import main.MyFrame;
@@ -36,15 +41,36 @@ public class GridPanel extends JPanel {
 
 	private List<Boolean> chosenStates;
 
-//	protected boolean inManageState = false;
+	// protected boolean inManageState = false;
 
 	protected OnItemClickListener gridItemClickListener;
 	private OnItemClickListener manageItemClickListener;
-//	private ManagePanel managePanel;
+	// private ManagePanel managePanel;
+
+	private boolean addManageBtn;
+
+	private boolean addScrollBar = false;
 
 	public GridPanel(List<String> datas) {
 		this.datas = datas;
+		initViews();
+		measureAndLayout(1.f);
+		setListeners();
+	}
 
+	public GridPanel(List<String> datas, boolean addManageBtn) {
+		this.datas = datas;
+		this.addManageBtn = addManageBtn;
+		initViews();
+		measureAndLayout(1.f);
+		setListeners();
+	}
+
+	public GridPanel(List<String> datas, boolean addManageBtn, boolean addScrollBar) {
+		this.datas = datas;
+		this.addManageBtn = addManageBtn;
+		this.addScrollBar = addScrollBar;
+		height = marginTB*2-gapVer + (datas.size() / 5 + 1) * (MyFrame.WIDTH / 10 + gapVer);
 		initViews();
 		measureAndLayout(1.f);
 		setListeners();
@@ -53,12 +79,32 @@ public class GridPanel extends JPanel {
 	private void initViews() {
 		// TODO Auto-generated method stub
 		setLayout(null);
-		setSize(width, height);
+		if (addScrollBar)
+			setPreferredSize(new Dimension(width, height));
+		else
+			setSize(width, height);
 		setBackground(null);
 		setOpaque(false);
 	}
 
 	private void measureAndLayout(float alpha) {
+
+		if (addManageBtn) {
+			JLabel manageLable = new JLabel("管理", JLabel.CENTER);
+			Border border = BorderFactory.createLineBorder(Color.WHITE, 1);
+			Font font = new Font("黑体", Font.PLAIN, 16);
+			manageLable.setBorder(border);
+			manageLable.setFont(font);
+
+			int labelHeight = MyFrame.HEIGHT / 20;
+
+			int labelWidth = labelHeight * 26 / 10;
+
+			manageLable.setBounds(width - labelWidth - 50, 15, labelWidth, labelHeight);
+			manageLable.setForeground(Color.WHITE);
+			add(manageLable);
+		}
+
 		labels = new ArrayList<ItemLabel>();
 		chosenStates = new ArrayList<>();
 		int curX = marginLR, curY = marginTB;
@@ -95,26 +141,28 @@ public class GridPanel extends JPanel {
 		}
 	}
 
-//	public void showManagePanel(String text) {
-//		if (managePanel == null) {
-//			managePanel = new ManagePanel();
-//			managePanel.setFirstLabelText(text);
-//			managePanel.setBounds(marginLR, -managePanel.getHeight(), managePanel.getWidth(), managePanel.getHeight());
-//			managePanel.setItemClickListener(manageItemClickListener);
-//			add(managePanel);
-//			AnimationUtil.doSlideAima(managePanel, managePanel.getX(), managePanel.getX(), -managePanel.getHeight(),
-//					(marginTB - managePanel.getHeight()) / 2, 500, 0);
-//
-//		} else {
-//			add(managePanel);
-//			repaint();
-//		}
-//	}
+	// public void showManagePanel(String text) {
+	// if (managePanel == null) {
+	// managePanel = new ManagePanel();
+	// managePanel.setFirstLabelText(text);
+	// managePanel.setBounds(marginLR, -managePanel.getHeight(),
+	// managePanel.getWidth(), managePanel.getHeight());
+	// managePanel.setItemClickListener(manageItemClickListener);
+	// add(managePanel);
+	// AnimationUtil.doSlideAima(managePanel, managePanel.getX(),
+	// managePanel.getX(), -managePanel.getHeight(),
+	// (marginTB - managePanel.getHeight()) / 2, 500, 0);
+	//
+	// } else {
+	// add(managePanel);
+	// repaint();
+	// }
+	// }
 
-//	public void hideManagePanel() {
-//		remove(managePanel);
-//		repaint();
-//	}
+	// public void hideManagePanel() {
+	// remove(managePanel);
+	// repaint();
+	// }
 
 	public void handleAllStates(boolean chosen) {
 		for (int i = 0; i < chosenStates.size(); i++) {
@@ -173,28 +221,28 @@ public class GridPanel extends JPanel {
 		}
 	}
 
-//	public void deleteSelectFiles(String parentFilePath){
-//		for(int i=0;i<chosenStates.size();i++){
-//			if(chosenStates.get(i)){
-//				String filePath=parentFilePath+File.separator+datas.get(i)+".txt";
-//				FileUtil.deleteFile(filePath);
-//			}
-//		}
-//	}
-	
+	// public void deleteSelectFiles(String parentFilePath){
+	// for(int i=0;i<chosenStates.size();i++){
+	// if(chosenStates.get(i)){
+	// String filePath=parentFilePath+File.separator+datas.get(i)+".txt";
+	// FileUtil.deleteFile(filePath);
+	// }
+	// }
+	// }
+
 	public void reLayout() {
-		for(ItemLabel label:labels) {
+		for (ItemLabel label : labels) {
 			remove(label);
 		}
-		
+
 		labels.clear();
 		chosenStates.clear();
 		measureAndLayout(1.f);
 		setListeners();
-		
+
 		repaint();
 	}
-	
+
 	public void setChosenState(int position) {
 		boolean state = chosenStates.get(position);
 		chosenStates.set(position, !state);

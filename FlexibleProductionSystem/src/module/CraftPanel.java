@@ -1,5 +1,6 @@
 package module;
 
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 import adapter.OnItemClickListener;
 import adapter.OnNotifyListener;
@@ -27,6 +30,8 @@ import panels.JobshopInfoPanel;
 import panels.LeftSidePanel;
 import panels.PartDetailPanel;
 import panels.ProductStructionPanel;
+import views.ShadePanel;
+import views.VerticalScrollBarUI;
 
 /**
  * 工艺配置模块
@@ -41,6 +46,7 @@ public class CraftPanel extends JPanel {
 
 	List<GridPanel> gridPanels;
 	private GridPanel curGridPanel;
+	private JScrollPane scrollPane;
 
 	// 产品
 	private GridPanel productGridPanel;
@@ -74,7 +80,7 @@ public class CraftPanel extends JPanel {
 
 				if (position == 0) {
 					if (curGridPanel != productGridPanel) {
-						remove(curGridPanel);
+						remove(scrollPane);
 						add(productGridPanel);
 						curGridPanel = productGridPanel;
 						repaint();
@@ -82,7 +88,9 @@ public class CraftPanel extends JPanel {
 				} else {
 					if (curGridPanel != partGridPanel) {
 						remove(curGridPanel);
-						add(partGridPanel);
+						add(scrollPane);
+						JScrollBar bar=scrollPane.getVerticalScrollBar();
+						bar.setValue(1);
 						curGridPanel = partGridPanel;
 						repaint();
 					}
@@ -209,12 +217,22 @@ public class CraftPanel extends JPanel {
 		List<String> productNames = new ArrayList<>();
 		for (Product product : products)
 			productNames.add(product.name);
-		productGridPanel = new GridPanel(productNames);
+		productGridPanel = new GridPanel(productNames,true);
 
 		List<String> partNames = new ArrayList<>();
 		for (Part part : parts)
 			partNames.add(part.name);
-		partGridPanel = new GridPanel(partNames);
+		partGridPanel = new GridPanel(partNames,true,true);
+//		ShadePanel shadePanel=new ShadePanel();
+//		shadePanel.setPreferredSize(partGridPanel.getPreferredSize());
+//		partGridPanel.setSize(partGridPanel.getPreferredSize().width,partGridPanel.getPreferredSize().height);
+//		shadePanel.add(partGridPanel);
+		scrollPane=new JScrollPane(partGridPanel);
+		scrollPane.setBackground(null);
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
+		scrollPane.setBounds(MyFrame.WIDTH/4, 0, MyFrame.WIDTH*3/4-5, MyFrame.HEIGHT);
+		scrollPane.getVerticalScrollBar().setUI(new VerticalScrollBarUI());
 	}
 
 	private void readDatas() {
