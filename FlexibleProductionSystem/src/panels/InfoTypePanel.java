@@ -115,6 +115,12 @@ public class InfoTypePanel extends JPanel {
 		materialInfoLabel.setBounds(curX, curY, ChoicePanel.ITEM_WIDTH, ChoicePanel.ITEM_HEIGHT);
 		add(materialInfoLabel);
 	}
+	
+	public void backHere() {
+		userInfoLabel.setAlpha(0.f);
+		materialInfoLabel.setAlpha(0.f);
+		doAlphaAnim(ANIM_IN, null);
+	}
 
 	// 淡入动画
 	public static int ANIM_IN = 0;

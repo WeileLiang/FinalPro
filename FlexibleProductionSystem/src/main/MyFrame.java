@@ -15,7 +15,9 @@ import javax.swing.JPanel;
 
 import adapter.OnNotifyListener;
 import module.ChoicePanel;
+import module.InfoManagePanel;
 import module.LoginPanel;
+import panels.InfoTypePanel;
 import views.ShadePanel;
 
 public class MyFrame extends JFrame {
@@ -124,6 +126,13 @@ public class MyFrame extends JFrame {
 	public void back2LastPanel() {
 		jLayeredPane.remove(stack.pop());
 		jLayeredPane.add(stack.peek(), new Integer(1));
+		JPanel panel=stack.peek();
+		System.out.println(panel.getClass());
+		if(panel instanceof InfoManagePanel) {
+			InfoManagePanel infoManagePanel=(InfoManagePanel) panel;
+			infoManagePanel.back2InfoTypePanel();
+			return;
+		}
 		repaint();
 	}
 

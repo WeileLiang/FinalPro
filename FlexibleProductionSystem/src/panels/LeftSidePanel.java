@@ -161,7 +161,7 @@ public class LeftSidePanel extends JPanel {
 
 	}
 
-	private void setSelectedItem(int position) {
+	public void setSelectedItem(int position) {
 		clearClickedState();
 		labels.get(position).setBackground(new Color(Constants.LIGHT_GRAY));
 		curClickPos=position;

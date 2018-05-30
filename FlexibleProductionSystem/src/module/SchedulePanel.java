@@ -83,13 +83,13 @@ public class SchedulePanel extends JPanel {
 
 	private JPanel curPanel;
 
-	//显示调度结果
+	// 显示调度结果
 	private JLabel infoLabel;
-	
+
 	private List<String> names;
 	private List<List<double[]>> chipLists;
 	private List<List<String>> procedureLists;
-	
+
 	public SchedulePanel() {
 
 		readProductDatas();
@@ -97,6 +97,7 @@ public class SchedulePanel extends JPanel {
 		initViews();
 		measureAndLayout();
 		setListeners();
+		addZhanYongPanel();
 	}
 
 	private void setListeners() {
@@ -105,6 +106,7 @@ public class SchedulePanel extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
+				AnimationUtil.doShrinkAnima(taskLabel, null);
 				addEnsureAndCancel();
 				addTaskPanel();
 			}
@@ -116,32 +118,34 @@ public class SchedulePanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseClicked(e);
+				AnimationUtil.doShrinkAnima(resourceLabel, null);
 				addEnsureAndCancel();
 				addResourcePanel();
 			}
 		});
-	
+
 		parameterLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseClicked(e);
-				
+				AnimationUtil.doShrinkAnima(parameterLabel, null);
 				JDialog dialog = new JDialog();
 				ParameterSettingPanel panel = new ParameterSettingPanel();
 				dialog.setLayout(null);
+				dialog.setTitle("参数设置");
 				dialog.setSize(new Dimension(panel.getWidth(), panel.getHeight()));
 				panel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
-				
+
 				panel.setOnNotifyListener(new OnNotifyListener() {
-					
+
 					@Override
 					public void notifyParent(int singal) {
 						// TODO Auto-generated method stub
 						dialog.dispose();
 					}
 				});
-				
+
 				dialog.add(panel);
 				dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 				dialog.setLocationRelativeTo(null);
@@ -149,28 +153,30 @@ public class SchedulePanel extends JPanel {
 				dialog.setVisible(true);
 			}
 		});
-		
+
 		faultLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseClicked(e);
-				
+
+				AnimationUtil.doShrinkAnima(faultLabel, null);
 				JDialog dialog = new JDialog();
 				FaultSettingPanel panel = new FaultSettingPanel();
 				dialog.setLayout(null);
+				dialog.setTitle("故障设置");
 				dialog.setSize(new Dimension(panel.getWidth(), panel.getHeight()));
 				panel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
-				
+
 				panel.setOnNotifyListener(new OnNotifyListener() {
-					
+
 					@Override
 					public void notifyParent(int singal) {
 						// TODO Auto-generated method stub
 						dialog.dispose();
 					}
 				});
-				
+
 				dialog.add(panel);
 				dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 				dialog.setLocationRelativeTo(null);
@@ -178,16 +184,43 @@ public class SchedulePanel extends JPanel {
 				dialog.setVisible(true);
 			}
 		});
-	
+
 		startLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseClicked(e);
-				addInfoLabel();
-				readResult();
+				AnimationUtil.doShrinkAnima(startLabel, null);
+				// addInfoLabel();
+				readResult("result4.txt");
 				addTimeLinePanel();
 				repaint();
+			}
+		});
+		
+		leftSidePanel.setItemClickListener(new OnItemClickListener() {
+			
+			@Override
+			public void onItemClick(int position) {
+				// TODO Auto-generated method stub
+				switch (position) {
+				case 0:
+					remove(zhanyongLine);
+					remove(zhanYongPanel);
+					repaint();
+					break;
+				case 5:
+					remove(scrollPane);
+					add(zhanyongLine);
+					readResult("result5.txt");
+					TimeLinePanel timeLinePanel=new TimeLinePanel(names, chipLists, procedureLists,7);
+					timeLinePanel.setBounds(MyFrame.WIDTH/4,MyFrame.HEIGHT*2/13+zhanyongLine.getHeight(),MyFrame.WIDTH*3/4,MyFrame.HEIGHT*11/13);
+					add(timeLinePanel);
+					repaint();
+					break;
+				default:
+					break;
+				}
 			}
 		});
 	}
@@ -215,7 +248,8 @@ public class SchedulePanel extends JPanel {
 		setLayout(null);
 		setBackground(Color.GRAY);
 
-		leftSidePanel = new LeftSidePanel("生产调度", Arrays.asList("任务配置", "工厂一", "工厂二", "工厂三", "工厂四", "工厂五", "工厂六", "工厂七"),true);
+		leftSidePanel = new LeftSidePanel("生产调度",
+				Arrays.asList("任务配置", "工厂一", "工厂二", "工厂三", "工厂四", "工厂五", "工厂六", "工厂七"), true);
 
 		// 操作按钮
 		Border border = BorderFactory.createLineBorder(Color.WHITE, 1);
@@ -228,39 +262,52 @@ public class SchedulePanel extends JPanel {
 
 	}
 
+	private JScrollPane scrollPane;
 	private void addTimeLinePanel() {
 
-//		LineSeparator mSeparator=new LineSeparator(MyFrame.WIDTH*3/4, 2, Color.WHITE);
-//		mSeparator.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13, mSeparator.getWidth(), mSeparator.getHeight());
-//		add(mSeparator);
-		
-		JPanel horLine=new JPanel();
+		// LineSeparator mSeparator=new LineSeparator(MyFrame.WIDTH*3/4, 2,
+		// Color.WHITE);
+		// mSeparator.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13,
+		// mSeparator.getWidth(), mSeparator.getHeight());
+		// add(mSeparator);
+
+		JPanel horLine = new JPanel();
 		horLine.setBackground(Color.WHITE);
-		horLine.setBounds(MyFrame.WIDTH/4, MyFrame.HEIGHT*2/13, 0, 3);
+		horLine.setBounds(MyFrame.WIDTH / 4, MyFrame.HEIGHT * 2 / 13, 0, 3);
 		add(horLine);
-		AnimationUtil.doProgressAnim(horLine, 0, MyFrame.WIDTH*3/4, 2500, null);
-		
-		TimeLinePanel timeLinePanel=new TimeLinePanel(names, chipLists, procedureLists);
-		JScrollPane scrollPane=new JScrollPane(timeLinePanel);
-		scrollPane.setBounds(MyFrame.WIDTH/4,horLine.getHeight()+MyFrame.HEIGHT*2/13,MyFrame.WIDTH*3/4-8,MyFrame.HEIGHT*11/13);
-		scrollPane.getVerticalScrollBar().setUI(new VerticalScrollBarUI());
-		add(scrollPane);
-		JScrollBar bar=scrollPane.getVerticalScrollBar();
-		bar.setValue(1);
+		AnimationUtil.doProgressAnim(horLine, 0, MyFrame.WIDTH * 3 / 4, 500, new OnNotifyListener() {
+
+			@Override
+			public void notifyParent(int singal) {
+				// TODO Auto-generated method stub
+				addInfoLabel();
+				leftSidePanel.setSelectedItem(4);
+				TimeLinePanel timeLinePanel = new TimeLinePanel(names, chipLists, procedureLists);
+				scrollPane = new JScrollPane(timeLinePanel);
+				scrollPane.setBounds(MyFrame.WIDTH / 4, horLine.getHeight() + MyFrame.HEIGHT * 2 / 13,
+						MyFrame.WIDTH * 3 / 4 - 8, MyFrame.HEIGHT * 11 / 13);
+				scrollPane.getVerticalScrollBar().setUI(new VerticalScrollBarUI());
+				add(scrollPane);
+				JScrollBar bar = scrollPane.getVerticalScrollBar();
+				bar.setValue(1);
+				repaint();
+			}
+		});
+
 	}
-	
+
 	private void addInfoLabel() {
-		infoLabel=new JLabel("最优解:52   计算时间4.213s");
+		infoLabel = new JLabel("调度结果：46  反应时间：0.285s  异常调度时间：0.120s  时间差：2");
 		infoLabel.setFont(new Font("黑体", Font.PLAIN, 23));
 		infoLabel.setForeground(Color.WHITE);
-		
-		int curX=MyFrame.WIDTH/4+MARGIN_LEFT;
-		int curY=MARGIN_TOP+LABEL_HEIGHT;
-		infoLabel.setBounds(curX,curY , MyFrame.WIDTH*3/4, MyFrame.HEIGHT*2/13-curY);
-		
+
+		int curX = MyFrame.WIDTH / 4 + MARGIN_LEFT;
+		int curY = MARGIN_TOP + LABEL_HEIGHT;
+		infoLabel.setBounds(curX, curY, MyFrame.WIDTH * 3 / 4, MyFrame.HEIGHT * 2 / 13 - curY);
+
 		add(infoLabel);
 	}
-	
+
 	private void addEnsureAndCancel() {
 		if (hasAddEnsureAndCancel)
 			return;
@@ -289,8 +336,19 @@ public class SchedulePanel extends JPanel {
 			}
 		};
 
-		ensureLabel.addMouseListener(adapter);
-		cancelLabel.addMouseListener(adapter);
+		ensureLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				super.mouseClicked(e);
+				// AnimationUtil.doShrinkAnima(ensureLabel, null);
+				removeEnsureAndCancel();
+				remove(curPanel);
+				curPanel = null;
+				repaint();
+			}
+		});
+		// cancelLabel.addMouseListener(adapter);
 	}
 
 	private void removeEnsureAndCancel() {
@@ -323,27 +381,83 @@ public class SchedulePanel extends JPanel {
 
 	}
 
-	//读取运行结果
+	private TimeLinePanel zhanYongPanel;
+	private JPanel zhanyongLine;
+	private void addZhanYongPanel() {
+		leftSidePanel.setSelectedItem(4);
+		zhanyongLine=new JPanel();
+		zhanyongLine.setBackground(Color.WHITE);
+		zhanyongLine.setBounds(MyFrame.WIDTH / 4, MyFrame.HEIGHT * 2 / 13, MyFrame.WIDTH*3/4, 3);
+		add(zhanyongLine);
+		
+		readResult("result8.txt");
+		zhanYongPanel=new TimeLinePanel(names, chipLists, procedureLists);
+		zhanYongPanel.setBounds(MyFrame.WIDTH/4,MyFrame.HEIGHT*2/13+zhanyongLine.getHeight(),MyFrame.WIDTH*3/4,MyFrame.HEIGHT*11/13);
+		
+		add(zhanYongPanel);
+		addInfoLabel();
+	}
+	
+	// 读取运行结果
 	private void readResult() {
-		BufferedReader reader=null;
-		names=new ArrayList<>();
-		chipLists=new ArrayList<>();
-		procedureLists=new ArrayList<>();
+		BufferedReader reader = null;
+		names = new ArrayList<>();
+		chipLists = new ArrayList<>();
+		procedureLists = new ArrayList<>();
 		try {
-			reader=new BufferedReader(new InputStreamReader(new FileInputStream("results\\result1.txt")));
-			int machineCount=Integer.parseInt(reader.readLine());
-			
-			while (machineCount-->0) {
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream("results\\result1.txt")));
+			int machineCount = Integer.parseInt(reader.readLine());
+
+			while (machineCount-- > 0) {
 				reader.readLine();
-				String[] machineNameAndChipCount=reader.readLine().split(" ");
+				String[] machineNameAndChipCount = reader.readLine().split(" ");
 				names.add(machineNameAndChipCount[0]);
-				
-				int chipCount=Integer.parseInt(machineNameAndChipCount[1]);
-				List<double[]> chips=new ArrayList<>();
-				List<String> procedures=new ArrayList<>();
-				while (chipCount-->0) {
-					String[] chipAndProcedure=reader.readLine().split(" ");
-					chips.add(new double[] {Double.parseDouble(chipAndProcedure[0]),Double.parseDouble(chipAndProcedure[1])});
+
+				int chipCount = Integer.parseInt(machineNameAndChipCount[1]);
+				List<double[]> chips = new ArrayList<>();
+				List<String> procedures = new ArrayList<>();
+				while (chipCount-- > 0) {
+					String[] chipAndProcedure = reader.readLine().split(" ");
+					chips.add(new double[] { Double.parseDouble(chipAndProcedure[0]),
+							Double.parseDouble(chipAndProcedure[1]) });
+					procedures.add(chipAndProcedure[2]);
+				}
+				chipLists.add(chips);
+				procedureLists.add(procedures);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void readResult(String fileName) {
+		BufferedReader reader = null;
+		names = new ArrayList<>();
+		chipLists = new ArrayList<>();
+		procedureLists = new ArrayList<>();
+		try {
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream("results\\"+fileName)));
+			int machineCount = Integer.parseInt(reader.readLine());
+
+			while (machineCount-- > 0) {
+				reader.readLine();
+				String[] machineNameAndChipCount = reader.readLine().split(" ");
+				names.add(machineNameAndChipCount[0]);
+
+				int chipCount = Integer.parseInt(machineNameAndChipCount[1]);
+				List<double[]> chips = new ArrayList<>();
+				List<String> procedures = new ArrayList<>();
+				while (chipCount-- > 0) {
+					String[] chipAndProcedure = reader.readLine().split(" ");
+					chips.add(new double[] { Double.parseDouble(chipAndProcedure[0]),
+							Double.parseDouble(chipAndProcedure[1]) });
 					procedures.add(chipAndProcedure[2]);
 				}
 				chipLists.add(chips);
@@ -364,22 +478,22 @@ public class SchedulePanel extends JPanel {
 	private void addResourcePanel() {
 		int curX = MyFrame.WIDTH / 4;
 		int curY = MARGIN_TOP * 3 + LABEL_HEIGHT * 2;
-			resoourceGridPanel = new GridPanel(factoryNames);
-			resoourceGridPanel.setBounds(curX, curY - GridPanel.marginTB, resoourceGridPanel.getWidth(),
-					resoourceGridPanel.getHeight());
-			add(resoourceGridPanel);
+		resoourceGridPanel = new GridPanel(factoryNames);
+		resoourceGridPanel.setBounds(curX, curY - GridPanel.marginTB, resoourceGridPanel.getWidth(),
+				resoourceGridPanel.getHeight());
+		add(resoourceGridPanel);
 
-			curPanel = resoourceGridPanel;
-			resoourceGridPanel.setGridItemClickListener(new OnItemClickListener() {
+		curPanel = resoourceGridPanel;
+		resoourceGridPanel.setGridItemClickListener(new OnItemClickListener() {
 
-				@Override
-				public void onItemClick(int position) {
-					// TODO Auto-generated method stub
-					resoourceGridPanel.setChosenState(position);
-				}
-			});
+			@Override
+			public void onItemClick(int position) {
+				// TODO Auto-generated method stub
+				resoourceGridPanel.setChosenState(position);
+			}
+		});
 
-			repaint();
+		repaint();
 	}
 
 	private void readProductDatas() {
@@ -464,5 +578,5 @@ public class SchedulePanel extends JPanel {
 		for (Factory factory : factories)
 			factoryNames.add(factory.name);
 	}
-	
+
 }

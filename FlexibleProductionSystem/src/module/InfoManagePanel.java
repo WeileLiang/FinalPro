@@ -73,4 +73,8 @@ public class InfoManagePanel extends JPanel {
 		add(infoTypePanel);
 	}
 
+	public void back2InfoTypePanel() {
+		infoTypePanel.backHere();
+	}
+	
 }

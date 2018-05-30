@@ -22,7 +22,7 @@ public class ParameterSettingPanel extends JPanel {
 
 	String[] parameters = { "蚂蚁数量m", "迭代次数Nc", "忽略信息素影响比例", "信息素权重系数α", "能见度权重系数β", "每轮信息素释放总量L", "信息素初始浓度τ0",
 			"信息度最小值τ(min)", "信息度最小值τ(max)", "信息素挥发因子" };
-	String[] values = { "60", "100", "0.1", "2", "2", "10", "1", "0.1", "10", "0.2" };
+	String[] values = { "20", "50", "0.1", "2", "2", "10", "1", "0.1", "8", "0.2" };
 
 	Font font = new Font("黑体", Font.PLAIN, 15);
 	Border border = BorderFactory.createLineBorder(Color.WHITE, 1);

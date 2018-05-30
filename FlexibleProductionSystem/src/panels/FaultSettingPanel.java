@@ -48,7 +48,7 @@ public class FaultSettingPanel extends JPanel {
 		int fieldWidth = 2 * gap;
 		int labelHeight = 33;
 
-		JLabel faultOpenLabel = new JLabel("开启故障测试", JLabel.CENTER);
+		JLabel faultOpenLabel = new JLabel("已开启故障测试模式", JLabel.CENTER);
 		faultOpenLabel.setForeground(Color.WHITE);
 		faultOpenLabel.setBorder(border);
 		faultOpenLabel.setFont(font);

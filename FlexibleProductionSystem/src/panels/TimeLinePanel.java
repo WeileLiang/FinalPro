@@ -45,6 +45,17 @@ public class TimeLinePanel extends JPanel {
 		measureAndLayout();
 	}
 
+	public TimeLinePanel(List<String> names, List<List<double[]>> chipLists, List<List<String>> procedureLists,int max) {
+		this.names = names;
+		this.chipLists = chipLists;
+		this.procedureLists = procedureLists;
+		height = names.size() * TimeLineItem.height + SchedulePanel.LABEL_HEIGHT*3/4 + SchedulePanel.MARGIN_TOP * 3;
+
+		this.max=max;
+		initViews();
+		measureAndLayout();
+	}
+	
 	private void measureAndLayout() {
 		// TODO Auto-generated method stub
 		int curY = SchedulePanel.MARGIN_TOP;
